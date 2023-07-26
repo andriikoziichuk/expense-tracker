@@ -2,8 +2,8 @@ package ua.andrew1903.expensetracker.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ua.andrew1903.expensetracker.dto.StatementDTO;
 import ua.andrew1903.expensetracker.dto.TransactionDTO;
-import ua.andrew1903.expensetracker.dto.TransactionJoinCategory;
 import ua.andrew1903.expensetracker.mapper.TransactionMapper;
 import ua.andrew1903.expensetracker.model.Transaction;
 import ua.andrew1903.expensetracker.repository.TransactionRepository;
@@ -32,21 +32,21 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<TransactionJoinCategory> getAllByCategoryId(Long id) {
-//        List<Transaction> response = repository.getAllByCategoryId(id);
-//        return mapper.fromTransactionList(response);
-        return repository.getAllByCategoryId(id);
+    public List<TransactionDTO> getAllByCategoryId(Long id) {
+        List<Transaction> response = repository.getAllByCategoryId(id);
+        return mapper.fromTransactionList(response);
     }
 
     @Override
-    public List<TransactionJoinCategory> getAllByCategoryIdAndBetweenDates(Long id, LocalDate from, LocalDate to) {
-//        List<Transaction> response = repository.getAllByCategoryIdAndBetweenDates(id, from, to);
-//        return mapper.fromTransactionList(response);
-        return repository.getAllByCategoryIdAndBetweenDates(id, from, to);
+    public List<TransactionDTO> getAllByCategoryIdAndBetweenDates(Long id, LocalDate from, LocalDate to) {
+        List<Transaction> response = repository.getAllByCategoryIdAndBetweenDates(id, from, to);
+        return mapper.fromTransactionList(response);
     }
 
     @Override
-    public Double getBalance() {
-        return repository.getBalance();
+    public StatementDTO getBalance() {
+        return StatementDTO.builder()
+                .balance(repository.getBalance())
+                .build();
     }
 }
