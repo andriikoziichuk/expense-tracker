@@ -1,7 +1,7 @@
-package ua.andrew1903.expensetracker.mapper.impl;
+package ua.andrew1903.expensetracker.service.mapper.impl;
 
 import ua.andrew1903.expensetracker.dto.TransactionDTO;
-import ua.andrew1903.expensetracker.mapper.TransactionMapper;
+import ua.andrew1903.expensetracker.service.mapper.TransactionMapper;
 import ua.andrew1903.expensetracker.model.Category;
 import ua.andrew1903.expensetracker.model.Transaction;
 

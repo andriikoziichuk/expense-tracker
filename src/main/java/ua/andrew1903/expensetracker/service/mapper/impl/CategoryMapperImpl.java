@@ -1,7 +1,7 @@
-package ua.andrew1903.expensetracker.mapper.impl;
+package ua.andrew1903.expensetracker.service.mapper.impl;
 
 import ua.andrew1903.expensetracker.dto.CategoryDTO;
-import ua.andrew1903.expensetracker.mapper.CategoryMapper;
+import ua.andrew1903.expensetracker.service.mapper.CategoryMapper;
 import ua.andrew1903.expensetracker.model.Category;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package ua.andrew1903.expensetracker.repository;
+package ua.andrew1903.expensetracker.service.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
@@ -20,50 +20,53 @@ import static org.jooq.impl.DSL.sum;
 @Repository
 @RequiredArgsConstructor
 public class TransactionRepository {
+    private static final CategoryTable CATEGORY_TABLE = CategoryTable.TABLE;
+    private static final TransactionTable TRANSACTION_TABLE = TransactionTable.TABLE;
+
     private final DSLContext context;
 
     public Transaction create(Transaction transaction) {
-        return context.insertInto(TransactionTable.TABLE)
-                .set(TransactionTable.TABLE.DATE, LocalDate.now())
-                .set(TransactionTable.TABLE.AMOUNT, transaction.getAmount())
-                .set(TransactionTable.TABLE.TYPE, transaction.getTransactionType().name())
-                .set(TransactionTable.TABLE.CATEGORY_ID, transaction.getCategory().getId().intValue())
+        return context.insertInto(TRANSACTION_TABLE)
+                .set(TRANSACTION_TABLE.DATE, LocalDate.now())
+                .set(TRANSACTION_TABLE.AMOUNT, transaction.getAmount())
+                .set(TRANSACTION_TABLE.TYPE, transaction.getTransactionType().name())
+                .set(TRANSACTION_TABLE.CATEGORY_ID, transaction.getCategory().getId().intValue())
                 .returning()
                 .fetchOne(TransactionRepository::recordMapToTransaction);
     }
 
     public List<Transaction> getAllBetweenDates(LocalDate from, LocalDate to) {
         return context.select()
-                .from(TransactionTable.TABLE)
-                .where(TransactionTable.TABLE.DATE.between(from, to))
+                .from(TRANSACTION_TABLE)
+                .where(TRANSACTION_TABLE.DATE.between(from, to))
                 .fetch(TransactionRepository::recordMapToTransaction);
     }
 
     public List<Transaction> getAllByCategoryId(Long id) {
         return context.select()
-                .from(TransactionTable.TABLE)
-                .leftJoin(CategoryTable.TABLE)
-                .on(CategoryTable.TABLE.ID.eq(TransactionTable.TABLE.CATEGORY_ID))
-                .where(TransactionTable.TABLE.CATEGORY_ID.eq(id.intValue()))
+                .from(TRANSACTION_TABLE)
+                .leftJoin(CATEGORY_TABLE)
+                .on(CATEGORY_TABLE.ID.eq(TRANSACTION_TABLE.CATEGORY_ID))
+                .where(TRANSACTION_TABLE.CATEGORY_ID.eq(id.intValue()))
                 .fetch(TransactionRepository::recordMapToTransactionJoin);
     }
 
     public List<Transaction> getAllByCategoryIdAndBetweenDates(Long id, LocalDate from, LocalDate to) {
         return context.select()
-                .from(TransactionTable.TABLE)
-                .leftJoin(CategoryTable.TABLE)
-                .on(CategoryTable.TABLE.ID.eq(TransactionTable.TABLE.CATEGORY_ID))
-                .where(TransactionTable.TABLE.DATE.between(from, to))
-                .and(TransactionTable.TABLE.CATEGORY_ID.eq(id.intValue()))
+                .from(TRANSACTION_TABLE)
+                .leftJoin(CATEGORY_TABLE)
+                .on(CATEGORY_TABLE.ID.eq(TRANSACTION_TABLE.CATEGORY_ID))
+                .where(TRANSACTION_TABLE.DATE.between(from, to))
+                .and(TRANSACTION_TABLE.CATEGORY_ID.eq(id.intValue()))
                 .fetch(TransactionRepository::recordMapToTransactionJoin);
     }
 
     public Double getBalance() {
         return context.select(
-                        sum(iif(TransactionTable.TABLE.TYPE.eq(TransactionType.EXPENSE.name()),
-                                (TransactionTable.TABLE.AMOUNT).mul(-1), TransactionTable.TABLE.AMOUNT))
+                        sum(iif(TRANSACTION_TABLE.TYPE.eq(TransactionType.EXPENSE.name()),
+                                (TRANSACTION_TABLE.AMOUNT).mul(-1), TRANSACTION_TABLE.AMOUNT))
                 )
-                .from(TransactionTable.TABLE)
+                .from(TRANSACTION_TABLE)
                 .fetchOne()
                 .into(Double.class);
     }
@@ -75,7 +78,7 @@ public class TransactionRepository {
                 .transactionType(TransactionType.valueOf(record.get(TransactionTable.TABLE.TYPE)))
                 .date(record.get(TransactionTable.TABLE.DATE))
                 .category(Category.builder()
-                        .id(record.get(CategoryTable.TABLE.ID).longValue())
+                        .id(record.get(CATEGORY_TABLE.ID).longValue())
                         .build())
                 .build();
     }
@@ -87,8 +90,8 @@ public class TransactionRepository {
                 .transactionType(TransactionType.valueOf(record.get(TransactionTable.TABLE.TYPE)))
                 .date(record.get(TransactionTable.TABLE.DATE))
                 .category(Category.builder()
-                        .name(record.get(CategoryTable.TABLE.NAME))
-                        .type(CategoryType.valueOf(record.get(CategoryTable.TABLE.TYPE)))
+                        .name(record.get(CATEGORY_TABLE.NAME))
+                        .type(CategoryType.valueOf(record.get(CATEGORY_TABLE.TYPE)))
                         .build())
                 .build();
     }
