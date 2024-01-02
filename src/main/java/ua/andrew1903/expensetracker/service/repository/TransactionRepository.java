@@ -6,6 +6,7 @@ import org.jooq.Record;
 import org.springframework.stereotype.Repository;
 import ua.andrew1903.expensetracker.db.tables.CategoryTable;
 import ua.andrew1903.expensetracker.db.tables.TransactionTable;
+import ua.andrew1903.expensetracker.dto.GroupingResultDTO;
 import ua.andrew1903.expensetracker.model.Category;
 import ua.andrew1903.expensetracker.model.CategoryType;
 import ua.andrew1903.expensetracker.model.Transaction;
@@ -14,8 +15,7 @@ import ua.andrew1903.expensetracker.model.TransactionType;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.jooq.impl.DSL.iif;
-import static org.jooq.impl.DSL.sum;
+import static org.jooq.impl.DSL.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -69,6 +69,14 @@ public class TransactionRepository {
                 .from(TRANSACTION_TABLE)
                 .fetchOne()
                 .into(Double.class);
+    }
+
+    public List<GroupingResultDTO> groupByDate() {
+        return context.select(TRANSACTION_TABLE.DATE, TRANSACTION_TABLE.TYPE, sum(TRANSACTION_TABLE.AMOUNT).cast(Double.class))
+                .from(TRANSACTION_TABLE)
+                .groupBy(List.of(TRANSACTION_TABLE.TYPE, TRANSACTION_TABLE.DATE))
+                .fetch()
+                .into(GroupingResultDTO.class);
     }
 
     private static Transaction recordMapToTransaction(Record record) {
