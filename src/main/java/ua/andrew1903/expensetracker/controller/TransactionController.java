@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ua.andrew1903.expensetracker.dto.GroupingResultDTO;
 import ua.andrew1903.expensetracker.dto.StatementDTO;
 import ua.andrew1903.expensetracker.dto.TransactionDTO;
 import ua.andrew1903.expensetracker.service.TransactionService;
@@ -22,6 +23,11 @@ public class TransactionController {
     @PostMapping("/api/expenses")
     public TransactionDTO create(@RequestBody TransactionDTO transaction) {
         return service.create(transaction);
+    }
+
+    @PostMapping("/api/expenses-kafka")
+    public TransactionDTO createAndSendMessage(@RequestBody TransactionDTO transaction) {
+        return service.createAndSendMessage(transaction);
     }
 
     @GetMapping("/api/expenses/range")
@@ -56,5 +62,10 @@ public class TransactionController {
     @GetMapping("/api/current-balance")
     public StatementDTO getCurrentBalance() {
         return service.getBalance();
+    }
+
+    @GetMapping("/api/group")
+    public List<GroupingResultDTO> getGroupByDate() {
+        return service.groupByDate();
     }
 }
